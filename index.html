@@ -1,209 +1,650 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>vinni did it!</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
-    
-    
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+
     <style>
-        :root {
-            --bg: #ffffff; 
-            --text: #121212; 
-            --accent: #f4f4f4;
-            --cursor-base: #121212;
-            --cursor-hover: rgba(18, 18, 18, 0.1); /* Color suave en hover */
-            --transition: cubic-bezier(0.23, 1, 0.32, 1);
-            text-transform: lowercase;
-        }
+      /* --- VARIABLES GLOBALES Y CONFIGURACIÓN BASE --- */
+      :root {
+          --bg: #ffffff;
+          --text: #121212;
+          --accent: #f4f4f4;
+          --cursor-color: #ffffff;
+          --transition: cubic-bezier(0.23, 1, 0.32, 1);
+          --panel-width: 450px;
+      }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg: #0a0a0a;
-                --text: #ffffff;
-                --accent: #1a1a1a;
-                --cursor-base: #ffffff;
-                --cursor-hover: rgba(255, 255, 255, 0.15);
-            }
-        }
+      @media (prefers-color-scheme: dark) {
+          :root {
+              --bg: #0a0a0a;
+              --text: #ffffff;
+              --accent: #1a1a1a;
+          }
+      }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
-        html { scroll-behavior: smooth; }
-        body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+      * { margin: 0; padding: 0; box-sizing: border-box; cursor: none !important; }
+      body { background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
 
-        /* --- NUEVO CURSOR REFINADO --- */
-        #cursor-follower {
-            position: fixed;
-            width: 12px;
-            height: 12px;
-            background-color: var(--cursor-base);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 999999;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s var(--transition), height 0.3s var(--transition), background-color 0.3s ease;
-        }
+      /* --- CURSOR --- */
+      #cursor-follower {
+          position: fixed; width: 12px; height: 12px;
+          background-color: var(--cursor-color);
+          border-radius: 50%; pointer-events: none; z-index: 999999;
+          transform: translate(-50%, -50%);
+          mix-blend-mode: difference;
+          transition: width 0.3s var(--transition), height 0.3s var(--transition), background-color 0.3s ease;
+      }
+      #cursor-follower.hovering { width: 50px; height: 50px; background-color: var(--cursor-color);}
 
-        /* Clase que aplicaremos con JS cuando el cursor esté sobre un link */
-        #cursor-follower.hovering {
-            width: 60px;
-            height: 60px;
-            background-color: var(--cursor-hover);
-            border: 1px solid var(--cursor-base);
-        }
+      /* --- NAV --- */
+      nav {
+          display: flex; justify-content: space-between; padding: 1.5rem 5%;
+          position: fixed; width: 100%; z-index: 10000;
+          background-color: var(--bg); opacity: 0; transform: translateY(-100%);
+          transition: 0.5s var(--transition);
+      }
+      nav.visible { opacity: 1; transform: translateY(0); }
+      nav a { color: var(--text); text-decoration: none; font-size: 0.7rem; font-weight: 600; margin-left: 20px; }
 
-        /* --- NAVEGACIÓN --- */
-        nav {
-            display: flex; justify-content: space-between; padding: 1.5rem 5%;
-            position: fixed; width: 100%; z-index: 10000;
-            background-color: var(--bg); opacity: 0; transform: translateY(-100%); 
-            transition: 0.5s var(--transition);
-        }
-        nav.visible { opacity: 1; transform: translateY(0); }
-        nav a { color: var(--text); text-decoration: none; font-size: 0.7rem; text-transform: lowercase; letter-spacing: 2px; font-weight: 600; margin-left: 20px; }
+      /* --- HERO --- */
+      header { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; text-align: center; }
+      .typewriter-container { font-size: clamp(2.5rem, 8vw, 6rem); font-weight: 300; letter-spacing: -3px; line-height: 1; }
+      .sub-header { color: #888; font-weight: 400; margin-top: 20px; display: block; font-size: clamp(2rem, 5vw, 5rem); }
 
-        /* --- HEADER --- */
-        header { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 0 5%; text-align: center; }
-        .typewriter-container { font-size: clamp(2.5rem, 8vw, 6rem); font-weight: 300; letter-spacing: -3px; line-height: 1; }
-        .sub-header { color: #888; font-weight: 400; margin-top: 20px; display: block; font-size: 5rem; text-align: center;}
+      /* --- GRID --- */
+      .work { padding: 10rem 5%; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 1rem; }
+      .project-card { background: var(--accent); padding: 10px; transition: 0.5s var(--transition); }
+      .img-wrap { width: 100%; aspect-ratio: 1/1; overflow: hidden; }
+      .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.8s; }
+      .project-card:hover img { filter: grayscale(0%); transform: scale(1.05); }
 
-        /* --- GRID --- */
-        .work { padding: 10rem 5%; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 3rem; }
-        .project-card { background: var(--accent); padding: 10px; transition: 0.5s var(--transition); }
-        .img-wrap { width: 100%; aspect-ratio: 16/10; overflow: hidden; }
-        .img-wrap img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); transition: 0.8s; }
-        .project-card:hover img { filter: grayscale(0%); transform: scale(1.05); }
+      /* --- MODAL --- */
+      #project-modal {
+          position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+          background: var(--bg); z-index: 100000; display: none;
+          overflow-y: auto; overflow-x: hidden;
+      }
 
-        /* --- MODAL --- */
-        #project-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg); z-index: 100000; display: none;
-            overflow-y: auto; padding: 10vh 10%;
-        }
-        .modal-content img { width: 100%; margin-top: 2rem; display: block; }
-        .close-modal { position: fixed; top: 30px; right: 5%; font-size: 3rem; font-weight: 200; z-index: 100001; }
+      .modal-header-info {
+          display: flex; justify-content: space-between; align-items: flex-start;
+          padding: 12vh 5% 4vh; transition: padding-right 0.6s var(--transition);
+          max-width: 1400px; margin: 0 auto;
+      }
+      .title-block { max-width: 70%; text-align: left; }
+      .modal-header-info h1 { font-size: clamp(2rem, 5vw, 4rem); font-weight: 300; letter-spacing: -2px; line-height: 1; }
+      .modal-header-info span { color: #888; font-size: 1.1rem; display: block; margin-top: 0.5rem; }
 
-        /* --- CONTACTO --- */
-        .contact { padding: 10rem 5%; background: var(--accent); text-align: center; }
-        form { max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
-        input, textarea { padding: 1rem; border: none; border-bottom: 1px solid #888; background: transparent; color: var(--text); font-family: inherit; outline: none; }
-        button { padding: 1.2rem; background: var(--text); color: var(--bg); border: none; font-weight: 600; text-transform: lowercase; }
-        .social-links { margin-top: 3rem; display: flex; justify-content: center; gap: 2rem; }
-        .social-links a { color: var(--text); font-size: 1.2rem; }
+      #info-btn {
+          display: inline-block; margin-top: 0.5rem; padding: 8px 16px;
+          border: 1px solid var(--text); font-size: 0.7rem; font-weight: 600;
+          letter-spacing: 1px; transition: 0.3s; white-space: nowrap;
+      }
+      #info-btn.active { background: var(--text); color: var(--bg); }
 
-        @media (max-width: 768px) { * { cursor: auto !important; } #cursor-follower { display: none; } }
+      .modal-content {
+        padding: 0 5% 10vh; transition: padding-right 0.6s var(--transition);
+        max-width: 1400px; margin: 0 auto;
+      }
+
+      /* --- ESTRUCTURA DE IMÁGENES EN EL MODAL --- */
+      #modal-images {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 20px;
+      }
+
+      .modal-img-container {
+          position: relative;
+          overflow: hidden;
+      }
+      .modal-img-container img {
+          width: 100%;
+          height: auto;
+          display: block;
+          object-fit: cover;
+      }
+      .img-caption {
+          position: absolute;
+          bottom: 0; left: 0; width: 100%;
+          padding: 15px;
+          background: rgba(0,0,0,0.7);
+          color: #fff;
+          font-size: 0.75rem;
+          font-weight: 400;
+          letter-spacing: 0.5px;
+          transform: translateY(100%);
+          transition: transform 0.4s var(--transition);
+          pointer-events: none;
+      }
+      .modal-img-container:hover .img-caption {
+          transform: translateY(0);
+      }
+
+      #project-modal.panel-open .modal-content,
+      #project-modal.panel-open .modal-header-info {
+          padding-right: calc(var(--panel-width) + 2%);
+      }
+
+      .close-modal {
+          position: fixed; top: 30px; right: 5%; font-size: 3rem; font-weight: 200;
+          z-index: 100010; transition: transform 0.3s var(--transition);
+      }
+      .close-modal:hover { transform: rotate(90deg); }
+
+      /* --- PANEL LATERAL --- */
+      #desc-panel {
+          position: fixed; top: 0; right: calc(var(--panel-width) * -1);
+          width: var(--panel-width); height: 100%;
+          background: var(--accent); color: var(--text);
+          z-index: 100002; padding: 12vh 3rem;
+          transition: right 0.6s var(--transition);
+          display: flex; flex-direction: column; gap: 2rem;
+          box-shadow: -10px 0 30px rgba(0,0,0,0.05);
+          overflow-y: auto;
+      }
+      #desc-panel.active { right: 0; }
+      .panel-section h2 { font-size: 0.7rem; letter-spacing: 2px; font-weight: 600; color: #888; margin-bottom: 0.5rem; }
+      .panel-section hr { border: none; border-top: 1px solid #ccc; margin: 0.5rem 0 1rem; }
+      .panel-section p { line-height: 1.6; font-size: 0.95rem; font-weight: 300; }
+
+      /* --- ZOOM DE IMAGEN (LIGHTBOX) --- */
+      #image-zoom-overlay {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.98);
+        backdrop-filter: blur(10px);
+        z-index: 200000;
+        display: none;
+        flex-direction: column; /* Apilamos verticalmente */
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.4s var(--transition);
+      }
+      #image-zoom-overlay.active {
+        display: flex;
+        opacity: 1;
+      }
+
+      /* Ajuste para que la imagen no toque el texto */
+      #image-zoom-overlay img {
+        max-width: 90%;
+        max-height: 70vh; /* Limitamos la altura para dejar espacio al pie */
+        object-fit: contain;
+        transform: scale(0.8);
+        transition: transform 0.5s var(--transition);
+        margin-bottom: 30px; /* Espacio extra entre imagen y texto */
+      }
+      #image-zoom-overlay.active img {
+        transform: scale(1);
+      }
+
+      /* BOTONES DE NAVEGACIÓN ZOOM */
+      .zoom-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+        font-size: 2rem;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 200001;
+        transition: 0.3s;
+      }
+      .zoom-nav:hover { background: rgba(255,255,255,0.1); }
+      #zoom-prev { left: 2%; }
+      #zoom-next { right: 2%; }
+
+      /* DESCRIPCIÓN EN ZOOM - MODIFICADO PARA NO CUBRIR */
+      #zoom-caption {
+        position: relative; /* Cambiado de absolute */
+        width: 100%;
+        text-align: center;
+        color: white;
+        font-size: 0.95rem;
+        font-weight: 300;
+        letter-spacing: 1px;
+        padding: 0 10% 20px;
+        max-width: 800px;
+      }
+
+      /* --- FOOTER --- */
+      .contact { padding: 10rem 5%; background: var(--bg); text-align: center; position: relative; }
+      .reveal-container { overflow: hidden; line-height: 1.2; padding: 0.2em 0; margin-bottom: 3rem; display: block; }
+      #know-more-trigger {
+          font-size: clamp(2rem, 5vw, 4rem); font-weight: 300; letter-spacing: -2px;
+          display: inline-block; transform: translateY(110%);
+          transition: transform 0.6s var(--transition), opacity 0.3s ease;
+          will-change: transform; user-select: none;
+      }
+      .reveal-container.active #know-more-trigger { transform: translateY(0%); }
+      .reveal-container.active #know-more-trigger:hover { transform: translateY(0%) scale(1.1); opacity: 0.6; }
+
+      .hidden-section {
+          max-height: 0; overflow: hidden; opacity: 0;
+          transition: max-height 1s var(--transition), opacity 0.8s var(--transition), margin 0.8s var(--transition);
+      }
+      .hidden-section.show { max-height: 600px; opacity: 1; margin-bottom: 4rem; margin-top: 2rem; }
+      .info-container { display: flex; align-items: center; justify-content: center; gap: 4rem; max-width: 900px; margin: 0 auto; text-align: left; }
+
+      .my-photo {
+          width: 250px; height: 250px; flex-shrink: 0; opacity: 0; transform: translateY(20px);
+          transition: opacity 0.8s ease 0.4s, transform 0.8s ease 0.4s;
+      }
+      .hidden-section.show .my-photo { opacity: 1; transform: translateY(0); }
+      .my-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%); border-radius: 2px; transition: 0.8s; }
+      .my-photo:hover img { filter: grayscale(0%); transform: scale(1.05); }
+
+      .my-text { max-width: 500px; }
+      .my-text h3 { font-size: 1.5rem; margin-bottom: 1rem; font-weight: 600; }
+      .my-text p { font-size: 1rem; line-height: 1.6; font-weight: 300; color: #888; }
+
+      .social-icons-wrapper { display: flex; justify-content: center; align-items: center; gap: 3rem; }
+      .social-icons-wrapper a { color: var(--text); font-size: 2rem; transition: 0.4s var(--transition); text-decoration: none; }
+      .social-icons-wrapper a:hover { transform: scale(1.3); opacity: 0.7; }
+
+      /* --- RESPONSIVIDAD --- */
+      @media (max-width: 900px) {
+          :root { --panel-width: 100%; }
+          .grid { grid-template-columns: 1fr; }
+          #modal-images { grid-template-columns: 1fr; }
+          #project-modal.panel-open .modal-content,
+          #project-modal.panel-open .modal-header-info { padding-right: 5%; opacity: 0.1; }
+          .modal-header-info { flex-direction: column; gap: 1rem; align-items: flex-start; }
+          .info-container { flex-direction: column; gap: 2rem; text-align: center; }
+          .my-photo { width: 180px; height: 180px; }
+          .zoom-nav { width: 40px; height: 40px; font-size: 1.5rem; }
+          #image-zoom-overlay img { max-height: 60vh; }
+      }
+
+      #modal-credits-panel a {
+        color: var(--text); text-decoration: none; font-weight: 600;
+        display: block; margin-bottom: 5px; transition: 0.3s;
+      }
+      #modal-credits-panel a:hover { opacity: 0.6; }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <div id="cursor-follower"></div>
 
     <nav id="main-nav">
-        <div class="logo">vinni did it!</div>
-        <div>
-            <a href="#work">projects</a>
-            <a href="#contact">contact</a>
-        </div>
+      <div class="logo">vinni did it!</div>
+      <div><a href="#work">projects</a><a href="#contact">contact</a></div>
     </nav>
 
     <header id="hero">
-        <div class="typewriter-container">
-            <span id="typewriter"></span><br>
-            <span class="sub-header">vinni did it!</span>
-        </div>
+      <div class="typewriter-container">
+        <span id="typewriter"></span><br /><span class="sub-header">vinni did it!</span>
+      </div>
     </header>
 
     <section id="work" class="work">
-        <div class="grid">
-            <div class="project-card" data-title="Editorial Concept" data-desc="Minimalismo aplicado al papel." data-images='["https://picsum.photos/id/20/1200/800", "https://picsum.photos/id/24/1200/800"]'>
-                <div class="img-wrap"><img src="https://picsum.photos/id/20/1200/800"></div>
-                <div style="margin-top:1rem; display:flex; justify-content:space-between; font-size:0.8rem"><span>Editorial</span><span>2024</span></div>
-            </div>
-            <div class="project-card" data-title="Visual Identity" data-desc="Sistemas visuales reactivos." data-images='["https://picsum.photos/id/36/1200/800", "https://picsum.photos/id/48/1200/800"]'>
-                <div class="img-wrap"><img src="https://picsum.photos/id/36/1200/800"></div>
-                <div style="margin-top:1rem; display:flex; justify-content:space-between; font-size:0.8rem"><span>Branding</span><span>2025</span></div>
-            </div>
-            <div class="project-card" data-title="Visual Identity" data-desc="Sistemas visuales reactivos." data-images='["https://picsum.photos/id/36/1200/800", "https://picsum.photos/id/48/1200/800"]'>
-                <div class="img-wrap"><img src="https://picsum.photos/id/36/1200/800"></div>
-                <div style="margin-top:1rem; display:flex; justify-content:space-between; font-size:0.8rem"><span>Branding</span><span>2025</span></div>
-            </div>
-            <div class="project-card" data-title="Visual Identity" data-desc="Sistemas visuales reactivos." data-images='["https://picsum.photos/id/36/1200/800", "https://picsum.photos/id/48/1200/800"]'>
-                <div class="img-wrap"><img src="https://picsum.photos/id/36/1200/800"></div>
-                <div style="margin-top:1rem; display:flex; justify-content:space-between; font-size:0.8rem"><span>Branding</span><span>2025</span></div>
-            </div>
+      <div class="grid">
+        <div
+          class="project-card"
+          data-title="Amnesty International"
+          data-subtitle="Campaign · 2026"
+          data-desc="This campaign focuses on the visualization of children rights data through high-impact images, all of them try to project concepts based on childood, harsh reality and the consequences of repetitive abuse."
+          data-client="Amnesty International Spain (class project)"
+          data-disciplines="Campaign · Photography"
+          data-software="Photoshop · Illustrator · Indesign"
+          data-credits="Cecilia Castaño @ceecicc, Jordi Mascarell @mscrll.studio"
+          data-images='[
+            {"url": "img/projects/amnesty_international/cartel_01.jpg", "text": "Main poster"},
+            {"url": "img/projects/amnesty_international/cartel_02.jpg", "text": "Variation"},
+            {"url": "img/projects/amnesty_international/cartel_03.jpg", "text": "Variation"}
+          ]'
+        >
+          <div class="img-wrap"><img src="img/projects/amnesty_international/hero.jpg" /></div>
+          <div style="margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1rem;">
+            <span>Amnesty International Spain</span><span>Campaign</span>
+          </div>
         </div>
+        
+        <div
+          class="project-card"
+          data-title="Rock Am Ring"
+          data-subtitle="Campaign · 2025"
+          data-desc="This campaign focuses on the 40th anniversary of the music festival Rock Am Ring; specifically on the early-bird sales, where fans can get their tickets in a special cassette case format and choose from different designs inpired by past events. "
+          data-client="Rock Am Ring (class project)"
+          data-disciplines="Campaign · Graphic Design · Packaging"
+          data-software="Photoshop · Illustrator · Indesign"
+          data-credits=""
+          data-images='[
+            {"url": "img/projects/rock_am_ring/IG_02.jpg", "text": "Reel for social media"},
+            {"url": "img/projects/rock_am_ring/newsletter_mockup.jpg", "text": "Newsletter"},
+            {"url": "img/projects/rock_am_ring/tape_prime_A.jpg", "text": "Tape Card: Prime & Minimal · Side A"},
+            {"url": "img/projects/rock_am_ring/tape_prime_B.jpg", "text": "Tape Card: Prime & Minimal · Side B"},
+            {"url": "img/projects/rock_am_ring/tape_80s_A.jpg", "text": "Tape Card: 80s edition · Side A"},
+            {"url": "img/projects/rock_am_ring/tape_80s_B.jpg", "text": "Tape Card: 80s edition · Side B"},
+            {"url": "img/projects/rock_am_ring/tape_90s_A.jpg", "text": "Tape Card: 90s edition · Side A"},
+            {"url": "img/projects/rock_am_ring/tape_90s_B.jpg", "text": "Tape Card: 90s edition · Side B"},
+            {"url": "img/projects/rock_am_ring/tape_y2k_A.jpg", "text": "Tape Card: Y2K edition · Side A"},
+            {"url": "img/projects/rock_am_ring/tape_y2k_B.jpg", "text": "Tape Card: Y2K edition · Side B"},
+            {"url": "img/projects/rock_am_ring/tape_10s_A.jpg", "text": "Tape Card: 2k10 edition · Side A"},
+            {"url": "img/projects/rock_am_ring/tape_10s_B.jpg", "text": "Tape Card: 2k10 edition · Side B"},
+            {"url": "img/projects/rock_am_ring/tape_20s_A.jpg", "text": "Tape Card: 2k20 edition · Side A"},
+            {"url": "img/projects/rock_am_ring/tape_20s_B.jpg", "text": "Tape Card: 2k20 edition · Side A"}
+
+
+          ]'
+        >
+          <div class="img-wrap"><img src="img/projects/rock_am_ring/hero.jpg" /></div>
+          <div style="margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1rem;">
+            <span>Rock Am Ring</span><span>Campaign</span>
+          </div>
+        </div>
+
+        <div
+          class="project-card"
+          data-title="Estrella Galicia x Resurrection Fest"
+          data-subtitle="Packaging · 2025"
+          data-desc="The main objective was to design a special edition's packaging of any beer brand. In this case, the project was based on three core concepts: festival, underground and dualism."
+          data-client="Estrella Galicia (class project)"
+          data-disciplines="Campaign · Graphic Design · Packaging · Lettering · Photography"
+          data-software="Photoshop · Illustrator · Indesign"
+          data-credits=""
+          data-images='[
+            {"url": "img/projects/estrella_galicia/eg_lettering.jpg", "text": "Lettering of the special edition · Resurrection Fest"},
+            {"url": "img/projects/estrella_galicia/eg_cutout.jpg", "text": "Packaging die-cut"},
+            {"url": "img/projects/estrella_galicia/eg_bottle.jpg", "text": "Bottle label"},
+            {"url": "img/projects/estrella_galicia/eg_6_pack.jpg", "text": "6 Pack"}
+            
+
+          ]'
+        >
+          <div class="img-wrap"><img src="img/projects/estrella_galicia/hero.jpg" /></div>
+          <div style="margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1rem;">
+            <span>Estrella Galicia</span><span>Packaging</span>
+          </div>
+        </div>
+
+        <div
+          class="project-card"
+          data-title="Photoshooting · Ouka Leele"
+          data-subtitle="Potography · 2025"
+          data-desc="These portraits are based on Ouka Leele's style, where composition, colour and editing captures the surrealism of several categories of fine art."
+          data-client="Class project"
+          data-disciplines="Photography"
+          data-software="Photoshop"
+          data-credits="Kathe-O @iam.kathe9"
+          data-images='[
+            {"url": "img/projects/photography_ouka_leele/portrait_01.jpg", "text": "Sculpture"},
+            {"url": "img/projects/photography_ouka_leele/portrait_02.jpg", "text": "Photography"},
+            {"url": "img/projects/photography_ouka_leele/portrait_03.jpg", "text": "Music"},
+            {"url": "img/projects/photography_ouka_leele/portrait_04.jpg", "text": "Painting"},
+            {"url": "img/projects/photography_ouka_leele/portrait_05.jpg", "text": "Literature"},
+            {"url": "img/projects/photography_ouka_leele/portrait_06.jpg", "text": "Architecture"}
+            
+            
+
+          ]'
+        >
+          <div class="img-wrap"><img src="img/projects/photography_ouka_leele/hero.jpg" /></div>
+          <div style="margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1rem;">
+            <span>Portraits · Ouka Leele</span><span>Photography</span>
+          </div>
+        </div>
+
+        <div
+          class="project-card"
+          data-title="Saul Bass x Diablada Pillareña"
+          data-subtitle="Graphic Design · 2025"
+          data-desc="The main goal is to understand the graphic style of Saul Bass and develop a quadriptych that explores the designer's visual language. In addition, the second part focuses in apply his style into a poster of any local festivity."
+          data-client="Class project"
+          data-disciplines="Campaign · Graphic Design · Editorial Design"
+          data-software="Photoshop · Illustrator · InDesign"
+          data-credits=""
+          data-images='[
+            {"url": "img/projects/saul_bass/draft_01.jpg", "text": "Quadriptych sketches"},
+            {"url": "img/projects/saul_bass/draft_02.jpg", "text": "Quadriptych sketches"},
+            {"url": "img/projects/saul_bass/quad_ext.jpg", "text": "Quadriptych exterior side"},
+            {"url": "img/projects/saul_bass/quad_int.jpg", "text": "Quadriptych interior side"},
+            {"url": "img/projects/saul_bass/mockup_quad_int.jpg", "text": "Quadriptych mockup · Interior side"},
+            {"url": "img/projects/saul_bass/mockup_quad_ext.jpg", "text": "Quadriptych mockup · Exterior side"},
+            {"url": "img/projects/saul_bass/draft_poster_01.jpg", "text": "Poster sketches"},
+            {"url": "img/projects/saul_bass/draft_poster_02.jpg", "text": "Poster sketches"},
+            {"url": "img/projects/saul_bass/poster.jpg", "text": "Poster"},
+            {"url": "img/projects/saul_bass/mockup_poster.jpg", "text": "Poster mockup"}
+            
+            
+
+          ]'
+        >
+          <div class="img-wrap"><img src="img/projects/saul_bass/hero.jpg" /></div>
+          <div style="margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1rem;">
+            <span>Saul Bass</span><span>Graphic Design</span>
+          </div>
+        </div>
+
+        <div
+          class="project-card"
+          data-title="Taborga"
+          data-subtitle="Brand Identity · 2026"
+          data-desc="."
+          data-client="Taborga (class project)"
+          data-disciplines="Brand Identity"
+          data-software="Photoshop · Illustrator · InDesign"
+          data-credits=""
+          data-images='[
+            {"url": "img/projects/taborga/taborga_2.jpg", "text": "Main isologo"},
+            {"url": "img/projects/taborga/taborga_3.jpg", "text": "Variations"},
+            {"url": "img/projects/taborga/taborga_4.jpg", "text": "Safezone"},
+            {"url": "img/projects/taborga/taborga_5.jpg", "text": "Minimum size"},
+            {"url": "img/projects/taborga/taborga_6.jpg", "text": "Typography"},
+            {"url": "img/projects/taborga/taborga_7.jpg", "text": " Colour palette"},
+            {"url": "img/projects/taborga/taborga_8.jpg", "text": "Usage"},
+            {"url": "img/projects/taborga/taborga_9.jpg", "text": "Usage"},
+            {"url": "img/projects/taborga/taborga_10.jpg", "text": "Usage"},
+            {"url": "img/projects/taborga/taborga_mockup.jpg", "text": "Mockup"}
+            
+            
+
+          ]'
+        >
+          <div class="img-wrap"><img src="img/projects/taborga/hero.jpg" /></div>
+          <div style="margin-top: 1rem; display: flex; justify-content: space-between; font-size: 1rem;">
+            <span>Taborga</span><span>Brand Identity</span>
+          </div>
+        </div>
+
+
     </section>
 
     <div id="project-modal">
-        <div class="close-modal">&times;</div>
-        <div class="modal-content">
-            <h1 id="modal-title"></h1>
-            <p id="modal-desc" style="color: #888; margin-top: 1rem;"></p>
-            <div id="modal-images"></div>
+      <div class="close-modal">&times;</div>
+      <div class="modal-header-info">
+        <div class="title-block">
+          <h1 id="modal-title-main"></h1>
+          <span id="modal-subtitle-main"></span>
         </div>
+        <div id="info-btn">info</div>
+      </div>
+
+      <div id="desc-panel">
+        <div class="panel-section"><h2>about</h2><hr /><p id="modal-desc-panel"></p></div>
+        <div class="panel-section"><h2>client</h2><hr /><p id="modal-client-panel"></p></div>
+        <div class="panel-section"><h2>disciplines</h2><hr /><p id="modal-disciplines-panel"></p></div>
+        <div class="panel-section"><h2>software</h2><hr /><p id="modal-software-panel"></p></div>
+        <div class="panel-section" id="credits-section">
+          <h2>project team</h2><hr /><p id="modal-credits-panel"></p>
+        </div>
+      </div>
+
+      <div class="modal-content">
+        <div id="modal-images"></div>
+      </div>
+    </div>
+
+    <div id="image-zoom-overlay">
+      <div id="zoom-prev" class="zoom-nav"><i class="fa-solid fa-chevron-left"></i></div>
+      <img src="" alt="Zoomed view" />
+      <div id="zoom-next" class="zoom-nav"><i class="fa-solid fa-chevron-right"></i></div>
+      <div id="zoom-caption"></div>
     </div>
 
     <footer id="contact" class="contact">
-        <h2>let's talk.</h2>
-        <form action="#">
-            <input type="text" placeholder="name" required>
-            <input type="email" placeholder="email" required>
-            <textarea rows="4" placeholder="your ideas"></textarea>
-            <button type="submit">send</button>
-        </form>
-        <div class="social-links">
-            <a href="#"><i class="fab fa-instagram"></i></a>
-            <a href="#"><i class="fab fa-behance"></i></a>
-            <a href="#"><i class="fab fa-linkedin"></i></a>
+      <h2 class="reveal-container">
+        <span id="know-more-trigger" style="cursor: pointer">want to know more?</span>
+      </h2>
+      <div id="extra-info-section" class="hidden-section">
+        <div class="info-container">
+          <div class="my-photo"><img src="https://picsum.photos/id/64/400/400" alt="Vinni" /></div>
+          <div class="my-text">
+            <h3>hi, i'm vinni.</h3>
+            <p>Aquí puedes escribir tu descripción creativa manteniendo el tono minimalista.</p>
+          </div>
         </div>
+      </div>
+      <div class="social-icons-wrapper">
+        <a href="mailto:hello@vinnididit.com"><i class="fa-regular fa-envelope"></i></a>
+        <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://behance.net" target="_blank"><i class="fa-brands fa-behance"></i></a>
+        <a href="https://linkedin.com" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+      </div>
     </footer>
 
     <script>
-    const cursor = document.getElementById('cursor-follower');
-    const textElement = document.getElementById('typewriter');
-    const modal = document.getElementById('project-modal');
-    const nav = document.getElementById('main-nav');
+      const cursor = document.getElementById("cursor-follower");
+      const modal = document.getElementById("project-modal");
+      const infoBtn = document.getElementById("info-btn");
+      const descPanel = document.getElementById("desc-panel");
+      const zoomOverlay = document.getElementById("image-zoom-overlay");
+      const zoomImg = zoomOverlay.querySelector("img");
+      const zoomCaption = document.getElementById("zoom-caption");
 
-    // Movimiento del cursor
-    window.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-    });
+      let currentProjectImages = [];
+      let currentZoomIndex = 0;
 
-    // Lógica de Hover para el cursor
-    function handleHoverIn() { cursor.classList.add('hovering'); }
-    function handleHoverOut() { cursor.classList.remove('hovering'); }
+      window.addEventListener("mousemove", (e) => {
+        cursor.style.left = e.clientX + "px";
+        cursor.style.top = e.clientY + "px";
+      });
 
-    function refreshInteractiveListeners() {
-        document.querySelectorAll('a, button, input, textarea, .project-card, .close-modal').forEach(el => {
-            el.addEventListener('mouseenter', handleHoverIn);
-            el.addEventListener('mouseleave', handleHoverOut);
+      function handleHoverIn() { cursor.classList.add("hovering"); }
+      function handleHoverOut() { cursor.classList.remove("hovering"); }
+
+      function refreshListeners() {
+        const interactiveElements = "a, button, .project-card, .close-modal, #info-btn, #know-more-trigger, .my-photo, .modal-img-container img, .zoom-nav";
+        document.querySelectorAll(interactiveElements).forEach((el) => {
+          el.addEventListener("mouseenter", handleHoverIn);
+          el.addEventListener("mouseleave", handleHoverOut);
         });
-    }
-    refreshInteractiveListeners();
+      }
 
-    // --- NUEVA FUNCIÓN PARA CERRAR EL MODAL ---
-    function closeProject() {
-        modal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        // Quitamos el estado de hover del cursor por si acaso se quedó pegado al botón de cerrar
-        handleHoverOut();
-    }
+      function updateZoomContent() {
+        const data = currentProjectImages[currentZoomIndex];
+        zoomImg.src = data.url;
+        zoomCaption.innerText = data.text || "";
+      }
 
-    // --- ESCUCHAR LA TECLA ESCAPE ---
-    window.addEventListener('keydown', (e) => {
-        if (e.key === "Escape") {
-            closeProject();
+      function openZoom(index) {
+        currentZoomIndex = index;
+        updateZoomContent();
+        zoomOverlay.style.display = "flex";
+        setTimeout(() => zoomOverlay.classList.add("active"), 10);
+      }
+
+      function closeZoom() {
+        zoomOverlay.classList.remove("active");
+        setTimeout(() => { zoomOverlay.style.display = "none"; }, 400);
+      }
+
+      function nextZoom(e) {
+        if(e) e.stopPropagation();
+        currentZoomIndex = (currentZoomIndex + 1) % currentProjectImages.length;
+        updateZoomContent();
+      }
+
+      function prevZoom(e) {
+        if(e) e.stopPropagation();
+        currentZoomIndex = (currentZoomIndex - 1 + currentProjectImages.length) % currentProjectImages.length;
+        updateZoomContent();
+      }
+
+      // Cerrar al hacer clic en el fondo negro, pero permitir clics en la imagen y controles
+      zoomOverlay.addEventListener("click", (e) => {
+        if (e.target === zoomOverlay || e.target === zoomCaption) closeZoom();
+      });
+
+      document.getElementById("zoom-next").addEventListener("click", nextZoom);
+      document.getElementById("zoom-prev").addEventListener("click", prevZoom);
+
+      function handleCloseAction() {
+        if (zoomOverlay.classList.contains("active")) {
+          closeZoom();
+        } else if (modal.classList.contains("panel-open")) {
+          modal.classList.remove("panel-open");
+          descPanel.classList.remove("active");
+          infoBtn.classList.remove("active");
+          infoBtn.innerText = "info";
+        } else {
+          modal.style.display = "none";
+          document.body.style.overflow = "auto";
+          handleHoverOut();
         }
-    });
+      }
 
-    // Typewriter
-    const phrases = ["Who did it?", "Who design it?", "Who took these photos?", "Who picked those colours?"];
-    let pIdx = 0, cIdx = 0, isDeleting = false;
+      if (infoBtn) {
+        infoBtn.addEventListener("click", () => {
+          descPanel.classList.toggle("active");
+          modal.classList.toggle("panel-open");
+          infoBtn.classList.toggle("active");
+          infoBtn.innerText = descPanel.classList.contains("active") ? "close info" : "info";
+        });
+      }
 
-    function type() {
+      window.addEventListener("keydown", (e) => { 
+        if (e.key === "Escape") handleCloseAction();
+        if (zoomOverlay.classList.contains("active")) {
+          if (e.key === "ArrowRight") nextZoom();
+          if (e.key === "ArrowLeft") prevZoom();
+        }
+      });
+
+      // --- SISTEMA AFK (Auto-Return to Top) ---
+        let idleTimer;
+        const idleTimeLimit = 30000; // 30 segundos (ajusta según prefieras)
+
+        function resetIdleTimer() {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => {
+                // Solo hace scroll si el usuario no está ya en el tope
+                if (window.scrollY > 200) {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }, idleTimeLimit);
+        }
+
+        // Detectar cualquier actividad humana
+        ['mousemove', 'scroll', 'keydown', 'mousedown', 'touchstart'].forEach(evt => {
+            window.addEventListener(evt, resetIdleTimer);
+        });
+        resetIdleTimer();
+
+
+
+      // TYPEWRITER
+      const phrases = ["Who did it?", "Who design it?"];
+      let pIdx = 0, cIdx = 0, isDeleting = false;
+      function type() {
+        const textElement = document.getElementById("typewriter");
+        if (!textElement) return;
         const current = phrases[pIdx];
         textElement.textContent = isDeleting ? current.substring(0, cIdx - 1) : current.substring(0, cIdx + 1);
         cIdx = isDeleting ? cIdx - 1 : cIdx + 1;
@@ -211,42 +652,108 @@
         if (!isDeleting && cIdx === current.length) { isDeleting = true; speed = 2000; }
         else if (isDeleting && cIdx === 0) { isDeleting = false; pIdx = (pIdx + 1) % phrases.length; speed = 500; }
         setTimeout(type, speed);
-    }
-    type();
+      }
+      type();
 
-    // Modal de proyectos
-    document.querySelectorAll('.project-card').forEach(card => {
-        card.addEventListener('click', () => {
-            document.getElementById('modal-title').innerText = card.dataset.title;
-            document.getElementById('modal-desc').innerText = card.dataset.desc;
-            const container = document.getElementById('modal-images');
-            container.innerHTML = '';
-            JSON.parse(card.dataset.images).forEach(src => {
-                const img = document.createElement('img');
-                img.src = src;
-                container.appendChild(img);
+      // OPEN PROJECT
+      document.querySelectorAll(".project-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          document.getElementById("modal-title-main").innerText = card.dataset.title;
+          document.getElementById("modal-subtitle-main").innerText = card.dataset.subtitle;
+          document.getElementById("modal-desc-panel").innerText = card.dataset.desc;
+          document.getElementById("modal-client-panel").innerText = card.dataset.client || "n/a";
+          document.getElementById("modal-disciplines-panel").innerText = card.dataset.disciplines || "n/a";
+          document.getElementById("modal-software-panel").innerText = card.dataset.software || "n/a";
+
+          const creditsContainer = document.getElementById("modal-credits-panel");
+          const creditsSection = document.getElementById("credits-section");
+          creditsContainer.innerHTML = "";
+
+          if (card.dataset.credits && card.dataset.credits.trim() !== "") {
+            creditsSection.style.display = "block";
+            card.dataset.credits.split(",").forEach(item => {
+              const parts = item.split("@");
+              const name = parts[0];
+              const handle = parts[1];
+              const link = document.createElement("a");
+              if (handle) {
+                link.href = `https://instagram.com/${handle.trim()}`;
+                link.target = "_blank";
+                link.innerText = `${name.trim()} (@${handle.trim()})`;
+              } else {
+                link.innerText = name.trim();
+              }
+              creditsContainer.appendChild(link);
             });
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        });
-    });
+          } else {
+            creditsSection.style.display = "none";
+          }
 
-    // El botón de cierre ahora usa la función centralizada
-    document.querySelector('.close-modal').addEventListener('click', closeProject);
+          const container = document.getElementById("modal-images");
+          container.innerHTML = "";
+          currentProjectImages = JSON.parse(card.dataset.images);
 
-    // Nav y AFK
-    let idleTimer;
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > window.innerHeight * 0.7) nav.classList.add('visible');
-        else nav.classList.remove('visible');
-        
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(() => {
-            if(window.scrollY > 500 && modal.style.display !== 'block') {
-                window.scrollTo({top: 0, behavior: 'smooth'});
+          currentProjectImages.forEach((imgObj, index) => {
+            const wrapper = document.createElement("div");
+            wrapper.className = "modal-img-container";
+            
+            const img = document.createElement("img");
+            img.src = imgObj.url;
+            img.style.cursor = "zoom-in";
+            img.addEventListener("click", (e) => {
+              e.stopPropagation();
+              openZoom(index);
+            });
+
+            wrapper.appendChild(img);
+
+            if (imgObj.text) {
+              const caption = document.createElement("div");
+              caption.className = "img-caption";
+              caption.innerText = imgObj.text;
+              wrapper.appendChild(caption);
             }
-        }, 30000);
-    });
-</script>
-</body>
+
+            container.appendChild(wrapper);
+          });
+
+          modal.style.display = "block";
+          document.body.style.overflow = "hidden";
+          refreshListeners();
+        });
+      });
+
+      document.querySelector(".close-modal").addEventListener("click", handleCloseAction);
+
+      window.addEventListener("scroll", () => {
+        const nav = document.getElementById("main-nav");
+        if (window.scrollY > window.innerHeight * 0.7) nav.classList.add("visible");
+        else nav.classList.remove("visible");
+      });
+
+      const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => { if (entry.isIntersecting) entry.target.classList.add("active"); });
+      }, { threshold: 0.1 });
+
+      const footerReveal = document.querySelector(".reveal-container");
+      if (footerReveal) revealObserver.observe(footerReveal);
+
+      const trigger = document.getElementById("know-more-trigger");
+      const infoSection = document.getElementById("extra-info-section");
+
+      if (trigger) {
+        trigger.addEventListener("click", () => {
+          const isOpening = !infoSection.classList.contains("show");
+          infoSection.classList.toggle("show");
+          if (isOpening) {
+            trigger.textContent = "this is me.";
+            setTimeout(() => { infoSection.scrollIntoView({ behavior: "smooth", block: "center" }); }, 100);
+          } else {
+            trigger.textContent = "want to know more?";
+          }
+        });
+      }
+      refreshListeners();
+    </script>
+  </body>
 </html>
