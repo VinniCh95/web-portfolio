@@ -500,22 +500,23 @@
 
     <footer id="contact" class="contact">
       <h2 class="reveal-container">
-        <span id="know-more-trigger" style="cursor: pointer">want to know more?</span>
+        <span id="know-more-trigger" style="cursor: pointer">Want to know more?</span>
       </h2>
       <div id="extra-info-section" class="hidden-section">
         <div class="info-container">
-          <div class="my-photo"><img src="https://picsum.photos/id/64/400/400" alt="Vinni" /></div>
+          <div class="my-photo"><img src="/img/me.jpg" alt="Vinni" /></div>
           <div class="my-text">
-            <h3>hi, i'm vinni.</h3>
-            <p>Aquí puedes escribir tu descripción creativa manteniendo el tono minimalista.</p>
+            <h3>Hi, I'm Vinni!</h3>
+            <p> I've become an industrial designer in 2017, but later I realize how much I love graphic design so I develop my career focusing in several fields, such as editorial or adevertising design.
+            </p>
           </div>
         </div>
       </div>
       <div class="social-icons-wrapper">
-        <a href="mailto:hello@vinnididit.com"><i class="fa-regular fa-envelope"></i></a>
-        <a href="https://instagram.com" target="_blank"><i class="fa-brands fa-instagram"></i></a>
-        <a href="https://behance.net" target="_blank"><i class="fa-brands fa-behance"></i></a>
-        <a href="https://linkedin.com" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="mailto:vinnichaluisa@gmail.com"><i class="fa-regular fa-envelope"></i></a>
+        <a href="https://www.instagram.com/vinni_did_it/" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.behance.net/vinnichaluis" target="_blank"><i class="fa-brands fa-behance"></i></a>
+        <a href="https://www.linkedin.com/in/vinicio-chaluisa-vaca" target="_blank"><i class="fa-brands fa-linkedin-in"></i></a>
       </div>
     </footer>
 
@@ -746,10 +747,10 @@
           const isOpening = !infoSection.classList.contains("show");
           infoSection.classList.toggle("show");
           if (isOpening) {
-            trigger.textContent = "this is me.";
+            trigger.textContent = "This is me:";
             setTimeout(() => { infoSection.scrollIntoView({ behavior: "smooth", block: "center" }); }, 100);
           } else {
-            trigger.textContent = "want to know more?";
+            trigger.textContent = "Want to know more?";
           }
         });
       }
